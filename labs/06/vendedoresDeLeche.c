@@ -1,5 +1,5 @@
 /**
- *	José Enrique Santana Martínez		A01636381
+ *	Jose Enrique Santana Martínez		A01636381
  *	Vendedores de leche usando MUTEX	lab_06
  */
 
@@ -13,51 +13,49 @@
 pthread_mutex_t mutex;
 int botesLeche = 1000;
 int vendedores = 5;
+int rondas = 5;
 int ventas = 0;
+//int numero =1;
 
 void venderLeche(intptr_t *t_id) {
 	intptr_t t_id2 = (intptr_t) t_id;
 	ventas = 1 + (rand() %201);
 	if (ventas < botesLeche) {
 		botesLeche = botesLeche - ventas;
-		printf("Vendedor %zd vendió %d botes de leche\n", t_id2, ventas);
+		printf("Vendedor %zd vendio %d botes de leche\n", t_id2, ventas);
 	}
 	else {
-		printf("Ups, el vendedor intentó vender más botellas de las que había en stock\n");
-		printf("No se completó la venta por %d botellas de leche\n", ventas);
+		printf("Ups, el vendedor intento vender mas botellas de las que habia en stock\n");
+		printf("No se completo la venta por %d botellas de leche\n", ventas);
 	}
 }
 
 void *hilos(void *i) {
 	intptr_t t_id = (intptr_t) i;
-	printf("Dentro del hilo %zd\n", t_id);
-	int venta = 0;
-
-	while (botesLeche > 0) {
-		venta++;
-
-		printf("Vendedor %zd intentando acceder a la venta #%d\n", t_id, venta);
-		pthread_mutex_lock(&mutex);
-		//printf("Mutex bloqueado por vendedor %zd\n", t_id);
+	
+	//printf("Dentro del hilo %zd\n", t_id);
+	//printf("\n%d\n", numero++);
+	
+	printf("Vendedor %zd intentando acceder a la venta\n", t_id);
+	pthread_mutex_lock(&mutex);
+	
+	//printf("Mutex bloqueado por vendedor %zd\n", t_id);
+	
+	if (botesLeche > 0) {
+		venderLeche((intptr_t *)t_id);
 		
-		if (botesLeche > 0 && venta < 6) {
-			venderLeche((intptr_t *)t_id);
-			//printf("Mutex desbloqueado por vendedor %zd\n", t_id);
-			printf("\n\t\t\t Botes de leche restantes = %d\n", botesLeche);
-			pthread_mutex_unlock(&mutex);
-
-			//printf("\n\nNúmero de venta = %d\n\n", venta);
-		}
-		else {
-			printf("No se pudo, ya se hicieron 5 ventas\n");
-			pthread_mutex_unlock(&mutex);
-			//printf("Desbloqueado por vendedor %zd\n", t_id);
-			
-			//printf("\n\nNúmero de venta = %d\n\n", venta);
-			printf("\n");
-			venta = 0;
-			pthread_exit(NULL);
-		}
+		//printf("Mutex desbloqueado por vendedor %zd\n", t_id);
+		
+		printf("\n\t\t\t Botes de leche restantes = %d\n", botesLeche);
+		pthread_mutex_unlock(&mutex);
+	}
+	else {
+		pthread_mutex_unlock(&mutex);
+		
+		//printf("Desbloqueado por vendedor %zd\n", t_id);
+		
+		printf("\n");
+		pthread_exit(NULL);
 	}
 }
 
@@ -70,8 +68,12 @@ int main(void) {
 	pthread_t thread[vendedores];
 
 	int i;
-	for (i = 0; i < vendedores; i++) {
-		pthread_create(&thread[i], NULL, hilos, (void*) (intptr_t) (i+1));
+	for (i = 0; i < rondas; i++) {
+		pthread_create(&thread[0], NULL, hilos, (void*) (intptr_t)(1));
+		pthread_create(&thread[1], NULL, hilos, (void*) (intptr_t)(2));
+		pthread_create(&thread[2], NULL, hilos, (void*) (intptr_t)(3));
+		pthread_create(&thread[3], NULL, hilos, (void*) (intptr_t)(4));
+		pthread_create(&thread[4], NULL, hilos, (void*) (intptr_t)(5));
 	}
 
 	for (i = 0; i < vendedores; i++) {
@@ -79,6 +81,6 @@ int main(void) {
 	}
 
 
-	printf("\n\nSe acabó la leche por hoy, por favor vuelva mañana\n");
+	printf("\n\nSe acabo la leche por hoy, por favor vuelva mañana\n");
 }
 
